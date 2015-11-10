@@ -1,4 +1,4 @@
-function mylog(v) { divStatsE.innerHTML += (v + "<br>"); }
+function mylog(v) { divStatsE.html(divStatsE.html() + v + "<br>"); }
 
 function resetImgs() {
   idxSelect = -99;
@@ -9,19 +9,38 @@ function resetImgs() {
 
 function resetPool() { // Once all images have been shown, start over
   resetImgs();
+
    // Slice() forces copy by value (doesn't just create a reference)
   fnPool  = img_fn.slice();
   idxPool = img_idx.slice();
-  if (myChartObj) { delete myChartObj; }
+
+  if (myChartObj) { myChartObj.destroy(); }
 }
 
 function global_init() {
   // Don't use "var" in this function; we need to init global vars
 
-  img_fn = ["blueMarinatedTurkey.jpg", "condimentSprays.jpg", "cornDogs.jpg", "cranberryCandles.jpg", "frozenShrimp.jpg", "frozenWhatAreThese.jpg", "heatedSoda.jpg", "jelloMayoTurkey.jpg", "pastaOnionsCandy.jpg", "whipcreamSoup.jpg"];
-  // Only 10 images here. Add at least 10 more images of your own!
+  img_fn = [
+    "blueMarinatedTurkey.jpg",
+    "condimentSprays.jpg",
+    "cornDogs.jpg",
+    "cranberryCandles.jpg",
+    "frozenShrimp.jpg",
+    "frozenWhatAreThese.jpg",
+    "heatedSoda.jpg",
+    "jelloMayoTurkey.jpg",
+    "pastaOnionsCandy.jpg",
+    "whipcreamSoup.jpg",
+    "good_cauliDog.jpg",
+    "good_happyPyramid.jpg",
+    "good_rawPyramid.jpg",
+    "good_rawVeganPyramid.jpg",
+    "good_vegPlate.jpg",
+    "good_veganProteinPowde.jpg"
+  ];
+  // TODO: Add 4 more images
 
-  // To track which imgs' indices of the original array have already by shown
+  // Tracks indices (of original array) of images that have been shown
   img_idx = [];
   for (var ii=0; ii < img_fn.length; ii++) { img_idx[ii] = ii; }
 
@@ -29,26 +48,21 @@ function global_init() {
 
   imgLeftE  = $('#imgLeft');
   imgRightE = $('#imgRight');
-//imgLeftE  = document.getElementById("imgLeft");
-//imgRightE = document.getElementById("imgRight");
-  btnVoteE  = document.getElementById("btnVote");
-  btnNewE   = document.getElementById("btnNew");
-  divStatsE = document.getElementById("divStats");
-  myChartE  = document.getElementById("myChart");
+  btnVoteE  = $('#btnVote');
+  btnNewE   = $('#btnNew');
+  divStatsE = $('#divStats');
+  myChartE  = $('#myChart');
 
-  ctx = myChartE.getContext("2d");
+  ctx = myChartE[0].getContext("2d");
   myChartObj = 0;
 
   resetPool();
 
-  imgLeftE.on( "click", function(ev) { selectImg(imgLeftE ); } );
-  imgRightE.on("click", function(ev) { selectImg(imgRightE); } );
-//imgRightE.addEventListener("click", selectImg);
-/*imgLeftE.addEventListener( "mouseover", selectImg);
-  imgRightE.addEventListener("mouseover", selectImg);*/
+  imgLeftE.on( "click", function() { selectImg(imgLeftE ); } );
+  imgRightE.on("click", function() { selectImg(imgRightE); } );
 
-  btnVoteE.addEventListener("click", recordVote);
-  btnNewE.addEventListener("click", newPair);
+  btnVoteE.on("click", function() { recordVote(); } );
+  btnNewE.on("click",  function() { newPair(); }    );
 }
 
 function getRandIntOnRange (a, b) {
@@ -57,9 +71,19 @@ function getRandIntOnRange (a, b) {
   return t;
 }
 
+function removeFilename(idx, maxIdx) {
+  // Remove img filename. ( Note: The code below is faster than splice(). )
+  fnPool[idx] = fnPool[maxIdx];
+  fnPool.pop();
+  // Update indices list
+  idxPool[idx]= idxPool[maxIdx];
+  idxPool.pop();
+}
+
 function showRandImg(imgE) {
   var maxIdx = fnPool.length - 1;
   if (maxIdx < 1) {
+    console.log("No images left in pool. Resetting pool.");
     resetPool();
     maxIdx = fnPool.length - 1;
   }
@@ -68,12 +92,8 @@ function showRandImg(imgE) {
   imgE.attr('src', imgDir + fnPool[idx]);
    // Extend object to have an property that holds idx w.r.t. original fn array
   imgE.idxOrig = idxPool[idx];
-
-  // Rmove chosen img filename. ( Note: this is faster than using splice(). )
-  fnPool[idx] = fnPool[maxIdx];
-  fnPool.pop();
-  idxPool[idx]= idxPool[maxIdx];
-  idxPool.pop();
+mylog("idx = " + idx);
+  removeFilename(idx, maxIdx);
 }
 
 function selectImg(el) {
@@ -81,19 +101,13 @@ function selectImg(el) {
     resetImgs();
     el.attr('class', 'imgPicked');
     idxSelect = el.idxOrig;
-console.log("el = " + el);
-console.log("el.idxOrig = " + el.idxOrig); // this.idxOrig);
-    //console.log("ev.which = " + el.which);
   }
 }
 
 function recordVote() {
-console.log("recordVote() called");
   if (idxSelect > -1) {
-console.log("ok to select");
-    console.log("voted. idxSelect="+idxSelect);
     voteAllowed = false;
-    btnVoteE.style.visibility = "hidden";
+    btnVoteE.css("visibility", "hidden");
     showChart();
   }
 }
@@ -146,34 +160,32 @@ function showChart() {
   /*** !! Insert code HERE to draw your chart and make it visible !! ***/
 
 
-  btnNewE.style.display = "inline";
-  btnNewE.style.visibility = "visible";
+  btnNewE.css("display",    "inline");
+  btnNewE.css("visibility", "visible");
 }
 
 function newPair() {
-  btnNewE.style.visibility = "hidden";
-  btnVoteE.style.visibility = "visible";
+  btnNewE.css( "visibility", "hidden");
+  btnVoteE.css("visibility", "visible");
+  resetImgs();
 
 
   /*** !! Insert code HERE to hide your chart !! ***/
 
 
-  // This seems to correctly free no-longer-used memory, but it
-  // doesn't wipe or hide the graphic that is "cached" in your
-  // <canvas>
+  // This seems to correctly free no-longer-used memory, but it doesn't wipe or
+  // hide the graphic that is "cached" in your <canvas>
   if (myChartObj) { myChartObj.destroy(); }
 
-  if (fnPool.length < 2) {
-    console.log("No images left in pool. Resetting pool");
-    resetPool();
-  }
-
-  resetImgs();
+  // TODO: If total img count is odd, handle case where only one filename is "left in the hat"
+//console.log("fnPool.length = " + fnPool.length);
   showRandImg(imgLeftE);
+//removeFilename(imgLeftE.idxOrig, fnPool.length-1);
   showRandImg(imgRightE);
 }
 
-global_init();
-
-showRandImg(imgLeftE);
-showRandImg(imgRightE);
+$(document).ready(function() {
+  global_init();
+  showRandImg(imgLeftE);
+  showRandImg(imgRightE);
+});
