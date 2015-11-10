@@ -1,10 +1,10 @@
-function mylog(v) { divStats.innerHTML += (v + "<br>"); }
+function mylog(v) { divStatsE.innerHTML += (v + "<br>"); }
 
 function resetImgs() {
   idxSelect = -99;
+  imgLeftE.attr( 'class', 'imgNormal');
+  imgRightE.attr('class', 'imgNormal');
   voteAllowed = true;
-  imgLeftE.className  = "imgNormal";
-  imgRightE.className = "imgNormal";
 }
 
 function resetPool() { // Once all images have been shown, start over
@@ -25,27 +25,30 @@ function global_init() {
   img_idx = [];
   for (var ii=0; ii < img_fn.length; ii++) { img_idx[ii] = ii; }
 
-  imgDir = "./img/"
+  imgDir = "./img/";
 
-  imgLeftE  = document.getElementById("imgLeft");
-  imgRightE = document.getElementById("imgRight");
-  btnVote   = document.getElementById("btnVote");
-  btnNew    = document.getElementById("btnNew");
-  divStats  = document.getElementById("divStats");
-  myChart   = document.getElementById("myChart");
+  imgLeftE  = $('#imgLeft');
+  imgRightE = $('#imgRight');
+//imgLeftE  = document.getElementById("imgLeft");
+//imgRightE = document.getElementById("imgRight");
+  btnVoteE  = document.getElementById("btnVote");
+  btnNewE   = document.getElementById("btnNew");
+  divStatsE = document.getElementById("divStats");
+  myChartE  = document.getElementById("myChart");
 
-  ctx = myChart.getContext("2d");
+  ctx = myChartE.getContext("2d");
   myChartObj = 0;
 
   resetPool();
 
-  imgLeftE.addEventListener( "click", selectImg);
-  imgRightE.addEventListener("click", selectImg);
-  imgLeftE.addEventListener( "mouseover", selectImg);
-  imgRightE.addEventListener("mouseover", selectImg);
+  imgLeftE.on( "click", function(ev) { selectImg(imgLeftE ); } );
+  imgRightE.on("click", function(ev) { selectImg(imgRightE); } );
+//imgRightE.addEventListener("click", selectImg);
+/*imgLeftE.addEventListener( "mouseover", selectImg);
+  imgRightE.addEventListener("mouseover", selectImg);*/
 
-  btnVote.addEventListener("click", recordVote);
-  btnNew.addEventListener("click", newPair);
+  btnVoteE.addEventListener("click", recordVote);
+  btnNewE.addEventListener("click", newPair);
 }
 
 function getRandIntOnRange (a, b) {
@@ -62,7 +65,7 @@ function showRandImg(imgE) {
   }
 
   var idx = getRandIntOnRange(0, maxIdx);
-  imgE.src = imgDir + fnPool[idx];
+  imgE.attr('src', imgDir + fnPool[idx]);
    // Extend object to have an property that holds idx w.r.t. original fn array
   imgE.idxOrig = idxPool[idx];
 
@@ -73,19 +76,24 @@ function showRandImg(imgE) {
   idxPool.pop();
 }
 
-function selectImg() {
+function selectImg(el) {
   if (voteAllowed) {
     resetImgs();
-    this.className = "imgPicked";
-    idxSelect = this.idxOrig;
+    el.attr('class', 'imgPicked');
+    idxSelect = el.idxOrig;
+console.log("el = " + el);
+console.log("el.idxOrig = " + el.idxOrig); // this.idxOrig);
+    //console.log("ev.which = " + el.which);
   }
 }
 
 function recordVote() {
+console.log("recordVote() called");
   if (idxSelect > -1) {
+console.log("ok to select");
     console.log("voted. idxSelect="+idxSelect);
     voteAllowed = false;
-    btnVote.style.visibility = "hidden";
+    btnVoteE.style.visibility = "hidden";
     showChart();
   }
 }
@@ -94,8 +102,6 @@ function showChart() {
   // The charting code here is just a placeholder, and is NOT the best way to
   // show votes or relative popularity. Improve the code below to generate more
   // easily understandable charts.
-
-  console.log("showChart()");
   var fnL = img_fn[imgLeftE.idxOrig];
   var fnR = img_fn[imgRightE.idxOrig];
   var labelL = fnL.split(".")[0];
@@ -140,29 +146,29 @@ function showChart() {
   /*** !! Insert code HERE to draw your chart and make it visible !! ***/
 
 
-  btnNew.style.display = "inline";
-  btnNew.style.visibility = "visible";
+  btnNewE.style.display = "inline";
+  btnNewE.style.visibility = "visible";
 }
 
 function newPair() {
-  console.log("newPair()");  
-  btnNew.style.visibility = "hidden";
-  btnVote.style.visibility = "visible";
+  btnNewE.style.visibility = "hidden";
+  btnVoteE.style.visibility = "visible";
 
 
   /*** !! Insert code HERE to hide your chart !! ***/
 
-  // This might correctly free some memory, but it doesn't wipe or hide the
-  // graphic that is "cached" in your <canvas>
+
+  // This seems to correctly free no-longer-used memory, but it
+  // doesn't wipe or hide the graphic that is "cached" in your
+  // <canvas>
   if (myChartObj) { myChartObj.destroy(); }
 
-
   if (fnPool.length < 2) {
-    console.log("Not enough images left. Resetting pool");  
+    console.log("No images left in pool. Resetting pool");
     resetPool();
   }
 
-  voteAllowed = true;
+  resetImgs();
   showRandImg(imgLeftE);
   showRandImg(imgRightE);
 }
