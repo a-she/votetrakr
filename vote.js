@@ -154,7 +154,7 @@ function newPair() {
 
   // This might correctly free some memory, but it doesn't wipe or hide the
   // graphic that is "cached" in your <canvas>
-  if (myChartObj) { delete myChartObj; }
+  if (myChartObj) { myChartObj.destroy(); }
 
 
   if (fnPool.length < 2) {

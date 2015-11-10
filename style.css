@@ -1,5 +1,4 @@
 @import url(https://fonts.googleapis.com/css?family=Abel);
-/* @import url(https://fonts.googleapis.com/css?family=Muli); */
 
 body {
   font-family: 'Abel', Arial, sans-serif;
@@ -27,8 +26,6 @@ img {
   border: 20px solid red;
 }
 
-.imgLeft = { float: left; }
-
 #btnVote{
   font-size: 2rem;
   margin-top: 10px;
@@ -36,6 +33,8 @@ img {
 }
 
 #btnNew{
+  font-size: 2rem;
+  margin-top: 10px;
   display: none;
   visibility: hidden;
 }
