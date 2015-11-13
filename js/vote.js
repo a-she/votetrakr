@@ -1,3 +1,34 @@
+var jsonStuff = {
+  "coord": {"lon":-122.68, "lat":45.52},
+  "weather":[ {"id":500,
+               "main":"Rain",
+               "description":"light rain",
+               "icon":"10n"}
+            ],
+  "base":"cmc stations",
+  "main":{"temp":279.638,
+          "pressure":1001.55,
+	  "humidity":97,
+	  "temp_min":279.638,
+	  "temp_max":279.638,
+	  "sea_level":1036.48,
+	  "grnd_level":1001.55},
+  "wind":{"speed":3.76,
+	  "deg":204},
+  "rain":{"3h":0.52},
+  "clouds":{"all":92},
+  "dt":1447216221,
+  "sys":{"message":0.0037,
+	 "country":"US",
+	 "sunrise":1447254260,
+	 "sunset":1447289076},
+  "id":5746545,
+  "name":"Portland",
+  "cod":200
+  };
+
+console.log(jsonStuff.name);
+
 function mylog(v) { divStatsE.html(divStatsE.html() + v + "<br>"); }
 
 function resetImgs() {
